@@ -1,0 +1,116 @@
+---
+title: "Project2"
+author: "Congxing Zhu"
+date: "11/30/2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,highlight = T,tidy = T,message = F, warning = F)
+```
+
+```{r}
+Tre <- rep(c("Ancora14","Ancora28","Fulcrum2","Blank","Water"), each=5)
+Rep <- rep(1:5,length=25)
+Num <- rep(20,length=25)
+WFT <- c(11,8,9,8,10,8,8,12,7,6,0,2,5,7,3,18,17,14,20,19,13,15,13,5,13)
+Data2 <- data.frame(Tre=as.factor(Tre),Rep,Num,WFT)
+```
+
+
+```{r}
+par(mfrow=c(1,2))
+plot(Data2$WFT)
+plot(WFT~Tre,data = Data2)
+tapply(WFT, Tre, mean,data=Data2)
+```
+
+
+```{r}
+m2.1 <- lm(WFT~Tre-1,data = Data2)
+summary(m2.1)
+```
+
+
+
+```{r}
+par(mfrow=c(1,2))
+plot(Data2$WFT,m2.1$residuals)#Checking the assumption of normality(*Nonnormal*).
+hist(m2.1$residuals,breaks = 15)
+shapiro.test(m2.1$residuals)
+```
+
+
+```{r} 
+plot(Data2$WFT,m2.1$residuals)#Checking the assumption of constant variance
+plot(Data2$Tre,m2.1$residuals)
+
+```
+
+
+
+```{r}
+plot(m2.1$residuals[-25],m2.1$residuals[-1])
+cor(m2.1$residuals[-25],m2.1$residuals[-1])
+library(lmtest)
+dwtest(m2.1)
+```
+
+
+```{r}
+anova(m2.1)
+Differ <- TukeyHSD(x=aov(Data2$WFT~Data2$Tre), 'Data2$Tre', conf.level=0.95)
+Differ
+library(multcomp)
+cld(summary(glht(m2.1, linfct = mcp(Tre = "Tukey"))),decreasing = T)
+```
+
+
+
+```{r,tidy=TRUE}
+library(agricolae)
+model<-aov(Data2$WFT~Data2$Tre, data=Data2)
+df<-df.residual(model)
+MSerror<-deviance(model)/df
+with(Data2,HSD.test(WFT,Tre,df,MSerror, group=TRUE,console=TRUE,main="Difference between the  treatments"))
+```
+
+
+
+```{r}
+m2.2 <- glm(cbind(WFT,Num-WFT)~Tre-1,family = quasibinomial(link = "logit"),data = Data2)
+summary(m2.2)
+library(multcomp)
+Differ2.2 <- summary(glht(m2.2, linfct = mcp(Tre = "Tukey")))
+Differ2.2
+cld(Differ2.2,decreasing = T)
+```
+
+
+```{r}
+library(gamlss)
+m2.3 <- gamlss(cbind(WFT, Num-WFT) ~ Tre-1, data=Data2, family=BB)
+summary(m2.3)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

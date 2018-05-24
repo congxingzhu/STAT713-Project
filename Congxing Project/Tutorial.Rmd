@@ -1,0 +1,145 @@
+---
+title: "Project1"
+author: "Congxing Zhu"
+date: "11/20/2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,tidy = TRUE, highlight = T,message = F, warning = F)
+```
+
+```{r}
+Tre <- rep(c("Blank","Water","K-1","K-0.5","K-0.13","K-0.06","S-8","S-5"), each=5)
+Rep <- rep(1:5,length=40)
+Num <- rep(20,length=40)
+WFT <- c(12,19,21,21,10,14,4,12,6,6,2,2,3,2,5,0,6,3,9,4,13,2,10,11,13,7,  5,10,6,7,3,0,1,2,3,4,3,5,0,2)
+Data1 <- data.frame(Tre=as.factor(Tre),Rep,Num,WFT)
+Data1$Num[Data1$WFT>20] <- 21
+```
+
+```{r}
+plot(WFT~Tre,data = Data1,col=c(2:8,"lightgreen"),cex.axis=1.5,las=2,xlab="",ylab="Number of WFT")
+tapply(WFT, Tre, mean,data=Data1) # mean of the treatments
+```
+
+
+```{r}
+m1 <- lm(WFT~Tre-1,data = Data1)#fit the data into simple linear model
+summary(m1)
+```
+
+```{r}
+par(mfrow=c(1,2))
+hist(Data1$WFT,breaks = 15)#Checking the assumption of normality
+hist(m1$residuals,breaks = 15)
+shapiro.test(m1$residuals)
+```
+
+```{r} 
+plot(Data1$WFT,m1$residuals)#Checking the assumption of constant variance
+abline(h=0,col="red")
+plot(as.numeric(Data1$Tre),m1$residuals)
+abline(h=0,col="blue")
+```
+
+```{r}
+plot(m1$residuals[-40],m1$residuals[-1])#Checking the assumption of independence
+cor(m1$residuals[-40],m1$residuals[-1])
+library(lmtest)
+dwtest(m1)
+```
+
+
+```{r,tidy=TRUE}
+anova(m1)#anova to check whether some of the coefficients are not zero
+Differ <- TukeyHSD(x=aov(Data1$WFT~Data1$Tre), 'Data1$Tre', conf.level=0.95)
+#Tukey test to compute the differences between each two groups 
+Differ
+#Tukey test to attribute them to different groups
+library(multcomp)
+cld(summary(glht(m1, linfct = mcp(Tre = "Tukey"))),decreasing = T)
+
+```
+
+
+```{r,tidy=TRUE}
+#Another way to do Tukey test
+library(agricolae)
+model<-aov(Data1$WFT~Data1$Tre, data=Data1)
+df<-df.residual(model)
+MSerror<-deviance(model)/df
+with(Data1,HSD.test(WFT,Tre,df,MSerror,group=TRUE,console=TRUE))
+
+```
+
+
+
+
+```{r}
+m2 <- glm(cbind(WFT,Num-WFT)~Tre-1,family = binomial(link = "logit"),data = Data1)#Fit the data into a binomial model(overdispersion)
+summary(m2)
+library(multcomp)
+Differ2 <- summary(glht(m2, linfct = mcp(Tre = "Tukey")))#Tukey test
+Differ2
+cld(Differ2,decreasing = T)
+```
+
+
+```{r}
+m3 <- glm(cbind(WFT,Num-WFT)~Tre-1,family = quasibinomial(link = "logit"),data = Data1)#Fit the data into a quasibinomial model(overdispersion)
+summary(m3)
+library(multcomp)
+Differ3 <- summary(glht(m3, linfct = mcp(Tre = "Tukey")))#Tukey test
+Differ3
+cld(Differ3,decreasing = T)
+```
+
+
+```{r}
+library(gamlss) 
+m3 <- gamlss(cbind(WFT, Num-WFT) ~ Tre-1, data=Data1, family=BB)
+#Fit the data into a beta binomial model(solve the problem of overdispersion in binomial model)
+summary(m3)
+```
+
+
+
+
+```{r}
+plot(WFT~Tre,data = Data1,col=c(2:8,"lightgreen"),cex.axis=0.8,xlab="",ylab="Number of WFT")#for project figure 
+hist(m1$residuals,breaks = 15,main = "")#for project figure 
+plot(as.numeric(Data1$Tre),m1$residuals,xlab = "Tre")#for project figure 
+abline(h=0,col="blue")#for project figure 
+plot(m1$residuals[-40],m1$residuals[-1])#for project figure 
+plot(WFT~as.numeric(Tre),data = Data1,xlab="",ylab="Number of WFT",ylim=c(-2,25))#for project figure 
+arrows(2,0,2.9,1.9,col = "blue")#for project figure 
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

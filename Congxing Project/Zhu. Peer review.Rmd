@@ -1,0 +1,42 @@
+---
+title: "Peer Review"
+author: "Congxing Zhu"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###1. 
+####I am reviewing Casey Pennock's project.
+
+###2. 
+####Casey and I coordinated enough time for each of us to look each other's project.
+
+###3. 
+####The main purpose of the study to check whether the fish communities are changing. What he did was testing if great plains fish communities are changing directionally and classifying the community dynamics of each site. He used permutation tests for inference in linear model to analyze the data collected at 38 sites from 1978-1996. After conducting the analysis, he found six percent (25 sites) of analyzed fish communities changed directionally in either structure (abundance or biomass) or composition (presence-absence) or both. And emporal community dynamics were highly variable in ordination space, which means the communities displayed patterns more typical of a loose-equilibrium based on ordination analysis.
+
+###4.
+####The final report looks great. But I also have some comments.
+####Comment 1: Bucause I don't have enough background about fish ecology, so it is a little hard for me to understand if you put a lot of references together.
+####Comment 2: I think it will be better if you talk about more details about the mothods you used in the project. 
+####Comment 3: For data analysis, it will be better to talk about the assumptions of the model or why you think the model you chose is reasonable.
+####Comment 4: For this project, it will be better if you can concentrate on trying different models for the same data, and do the model selection.
+####Comment 5: It will be better if you can make the graphs and figures in the project more clear.
+
+###5.
+####The results of the study reproducible are reproducible. But I think it will be better if we put all the data into one xlsx file with different sheets. And because there are so many repeating steps, so maybe building a function in R can save a lot of time.
+
+
+
+
+
+
+
+
+
+
+
+
+
